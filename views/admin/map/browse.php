@@ -1,9 +1,9 @@
-<?php 
+<?php
 queue_css_file('geolocation-items-map');
-    
+
 $title = __("Browse Items on the Map").' (' . html_escape($totalItems).' '.__('total').')';
 
-echo head(array('title' => $title));
+echo head(array('title' => $title, 'bodyclass' => 'map admin-browse'));
 echo item_search_filters();
 echo pagination_links();
 ?>

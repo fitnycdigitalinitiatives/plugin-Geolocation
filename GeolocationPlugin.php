@@ -16,7 +16,7 @@ class GeolocationPlugin extends Omeka_Plugin_AbstractPlugin
         'define_routes',
         'after_save_item',
         'admin_items_show_sidebar',
-        'public_items_show',
+        // 'public_items_show',
         'admin_items_search',
         'public_items_search',
         'items_browse_sql',
@@ -99,7 +99,7 @@ class GeolocationPlugin extends Omeka_Plugin_AbstractPlugin
             // If necessary, upgrade the plugin options
             // Check for old plugin options, and if necessary, transfer to new options
             $options = array('default_latitude', 'default_longitude', 'default_zoom_level', 'per_page');
-            foreach($options as $option) {
+            foreach ($options as $option) {
                 $oldOptionValue = get_option('geo_' . $option);
                 if ($oldOptionValue != '') {
                     set_option('geolocation_' . $option, $oldOptionValue);
@@ -189,19 +189,23 @@ class GeolocationPlugin extends Omeka_Plugin_AbstractPlugin
     public function hookDefineRoutes($args)
     {
         $router = $args['router'];
-        $mapRoute = new Zend_Controller_Router_Route('items/map',
-                        array('controller' => 'map',
+        $mapRoute = new Zend_Controller_Router_Route(
+            'items/map',
+            array('controller' => 'map',
                                 'action'     => 'browse',
-                                'module'     => 'geolocation'));
+                                'module'     => 'geolocation')
+        );
         $router->addRoute('items_map', $mapRoute);
 
         // Trying to make the route look like a KML file so google will eat it.
         // @todo Include page parameter if this works.
-        $kmlRoute = new Zend_Controller_Router_Route_Regex('geolocation/map\.kml',
-                        array('controller' => 'map',
+        $kmlRoute = new Zend_Controller_Router_Route_Regex(
+            'geolocation/map\.kml',
+            array('controller' => 'map',
                                 'action' => 'browse',
                                 'module' => 'geolocation',
-                                'output' => 'kml'));
+                                'output' => 'kml')
+        );
         $router->addRoute('map_kml', $kmlRoute);
     }
 
@@ -225,8 +229,13 @@ class GeolocationPlugin extends Omeka_Plugin_AbstractPlugin
         queue_js_file(array('leaflet/leaflet', 'leaflet/leaflet-providers', 'map'), 'javascripts', array(), $version);
 
         if (get_option('geolocation_cluster')) {
-            queue_css_file(array('MarkerCluster', 'MarkerCluster.Default'), null, null,
-                'javascripts/leaflet-markercluster', $version);
+            queue_css_file(
+                array('MarkerCluster', 'MarkerCluster.Default'),
+                null,
+                null,
+                'javascripts/leaflet-markercluster',
+                $version
+            );
             queue_js_file('leaflet-markercluster/leaflet.markercluster', 'javascripts', array(), $version);
         }
     }
@@ -278,28 +287,30 @@ class GeolocationPlugin extends Omeka_Plugin_AbstractPlugin
                   . '<div class="geolocation panel">'
                   . '<h4>' . __('Geolocation') . '</h4>'
                   . '<div style="margin: 14px 0">'
-                  . $view->geolocationMapSingle($item, '100%', '270px' )
+                  . $view->geolocationMapSingle($item, '100%', '270px')
                   . '</div></div>';
             echo $html;
         }
     }
 
-    public function hookPublicItemsShow($args)
-    {
-        $view = $args['view'];
-        $item = $args['item'];
-        $location = $this->_db->getTable('Location')->findLocationByItem($item, true);
+    // display in theme instead
 
-        if ($location) {
-            $width = get_option('geolocation_item_map_width') ? get_option('geolocation_item_map_width') : '';
-            $height = get_option('geolocation_item_map_height') ? get_option('geolocation_item_map_height') : '300px';
-            $html = "<div id='geolocation'>";
-            $html .= '<h2>'.__('Geolocation').'</h2>';
-            $html .= $view->geolocationMapSingle($item, $width, $height);
-            $html .= "</div>";
-            echo $html;
-        }
-    }
+    // public function hookPublicItemsShow($args)
+    // {
+    //     $view = $args['view'];
+    //     $item = $args['item'];
+    //     $location = $this->_db->getTable('Location')->findLocationByItem($item, true);
+    //
+    //     if ($location) {
+    //         $width = get_option('geolocation_item_map_width') ? get_option('geolocation_item_map_width') : '';
+    //         $height = get_option('geolocation_item_map_height') ? get_option('geolocation_item_map_height') : '300px';
+    //         $html = "<div id='geolocation'>";
+    //         $html .= '<h2>'.__('Geolocation').'</h2>';
+    //         $html .= $view->geolocationMapSingle($item, $width, $height);
+    //         $html .= "</div>";
+    //         echo $html;
+    //     }
+    // }
 
     /**
      * Hook to include a form in the admin items search form.
@@ -343,7 +354,7 @@ class GeolocationPlugin extends Omeka_Plugin_AbstractPlugin
                 "$alias.item_id = items.id",
                 array()
             );
-        } else if ($isMapped === false) {
+        } elseif ($isMapped === false) {
             $select->joinLeft(
                 array($alias => $db->Location),
                 "$alias.item_id = items.id",
@@ -375,7 +386,7 @@ class GeolocationPlugin extends Omeka_Plugin_AbstractPlugin
                 $radius = $db->quote($radius, Zend_Db::FLOAT_TYPE);
                 $lat = $db->quote($lat, Zend_Db::FLOAT_TYPE);
                 $lng = $db->quote($lng, Zend_Db::FLOAT_TYPE);
-                $sqlMathExpression = 
+                $sqlMathExpression =
                     new Zend_Db_Expr(
                         "$earthRadius * ACOS(
                         COS(RADIANS($lat)) *
@@ -384,18 +395,20 @@ class GeolocationPlugin extends Omeka_Plugin_AbstractPlugin
                         +
                         SIN(RADIANS($lat)) *
                         SIN(RADIANS(locations.latitude))
-                        ) AS distance");
-                
+                        ) AS distance"
+                    );
+
                 $select->columns($sqlMathExpression);
 
                 // WHERE the distance is within radius miles/kilometers of the specified lat & long
-                $locationWithinRadius = 
+                $locationWithinRadius =
                     new Zend_Db_Expr(
-                        "(locations.latitude BETWEEN $lat - $radius / $denominator 
+                        "(locations.latitude BETWEEN $lat - $radius / $denominator
                             AND $lat + $radius / $denominator)
                             AND
-                        (locations.longitude BETWEEN $lng - $radius / $denominator 
-                            AND $lng + $radius / $denominator)");
+                        (locations.longitude BETWEEN $lng - $radius / $denominator
+                            AND $lng + $radius / $denominator)"
+                    );
                 $select->where($locationWithinRadius);
 
                 // Actually use distance calculation.
@@ -423,7 +436,8 @@ class GeolocationPlugin extends Omeka_Plugin_AbstractPlugin
             } else {
                 $unit = __('miles');
             }
-            $displayArray['location'] = __('within %1$s %2$s of "%3$s"',
+            $displayArray['location'] = __(
+                'within %1$s %2$s of "%3$s"',
                 $requestArray['geolocation-radius'],
                 $unit,
                 $requestArray['geolocation-address']
@@ -447,7 +461,7 @@ class GeolocationPlugin extends Omeka_Plugin_AbstractPlugin
     public function hookInitialize()
     {
         add_translation_source(dirname(__FILE__) . '/languages');
-        add_shortcode( 'geolocation', array($this, 'geolocationShortcode'));
+        add_shortcode('geolocation', array($this, 'geolocationShortcode'));
     }
 
     public function filterAdminNavigationMain($navArray)
