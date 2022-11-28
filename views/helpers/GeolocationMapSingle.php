@@ -2,7 +2,7 @@
 
 class Geolocation_View_Helper_GeolocationMapSingle extends Zend_View_Helper_Abstract
 {
-    public function geolocationMapSingle($item = null, $width = '200px', $height = '200px', $hasBalloonForMarker = false, $markerHtmlClassName = 'geolocation_balloon')
+    public function geolocationMapSingle($item = null, $width = '200px', $height = '200px', $hasBalloonForMarker = false, $markerHtmlClassName = 'geolocation_balloon', $icon = null)
     {
         $divId = "item-map-{$item->id}";
         $location = get_db()->getTable('Location')->findLocationByItem($item, true);
@@ -24,6 +24,9 @@ class Geolocation_View_Helper_GeolocationMapSingle extends Zend_View_Helper_Abst
             }
             $options = array();
             $options['basemap'] = get_option('geolocation_basemap');
+            if ($icon == 'custom') {
+                $options['icon'] = 'custom';
+            }            
             $center = js_escape($center);
             $options = $this->view->geolocationMapOptions($options);
             $style = "width: $width; height: $height";

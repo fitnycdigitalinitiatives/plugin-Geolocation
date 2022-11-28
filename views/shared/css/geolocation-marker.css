@@ -72,7 +72,7 @@ p.geolocation_balloon_description {
 }
 
 /* public only */
-.map.browse .custom-icon {
+.map .custom-icon {
   border-radius: 50%;
   background-color: #f9683b;
   border: 2px solid rgb(255 255 255 / 50%);
