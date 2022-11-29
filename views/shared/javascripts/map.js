@@ -14,10 +14,10 @@ OmekaMap.prototype = {
   markerBounds: null,
   clusterGroup: null,
 
-  addMarker: function(latLng, options, bindHtml) {
+  addMarker: function (latLng, options, bindHtml) {
     var map = this.map;
     if (this.options.icon == 'custom') {
-      var customIcon = L.divIcon({className: 'custom-icon'});
+      var customIcon = L.divIcon({ className: 'custom-icon' });
       options.icon = customIcon;
     }
     var marker = L.marker(latLng, options);
@@ -33,7 +33,7 @@ OmekaMap.prototype = {
         autoPanPadding: [50, 50]
       });
       // Fit images on the map on first load
-      marker.once('popupopen', function(event) {
+      marker.once('popupopen', function (event) {
         var popup = event.popup;
         var imgs = popup.getElement().getElementsByTagName('img');
         for (var i = 0; i < imgs.length; i++) {
@@ -41,7 +41,7 @@ OmekaMap.prototype = {
             event.target.removeEventListener('load', imgLoadListener);
             // Marker autopan is disabled during panning, so defer
             if (map._panAnim && map._panAnim._inProgress) {
-              map.once('moveend', function() {
+              map.once('moveend', function () {
                 popup.update();
               });
             } else {
@@ -57,7 +57,7 @@ OmekaMap.prototype = {
     return marker;
   },
 
-  fitMarkers: function() {
+  fitMarkers: function () {
     if (this.markers.length == 1) {
       this.map.panTo(this.markers[0].getLatLng());
     } else if (this.markers.length > 0) {
@@ -67,7 +67,7 @@ OmekaMap.prototype = {
     }
   },
 
-  initMap: function() {
+  initMap: function () {
     if (!this.center) {
       alert('Error: The center of the map has not been set!');
       return;
@@ -78,10 +78,42 @@ OmekaMap.prototype = {
     ], this.center.zoomLevel);
     this.markerBounds = L.latLngBounds();
 
-    L.tileLayer.provider(this.options.basemap, this.options.basemapOptions).addTo(this.map);
+    if (this.options.icon == 'custom') {
+      var mbAttr =
+        'Tiles &copy;Esri&mdash;Source:Esri,i-cubed,USDA,USGS,AEX,GeoEye,Getmapping,Aerogrid,IGN,IGP,UPR-EGP,and the GIS User Community';
+      var mbUrl =
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+      L.tileLayer(
+        mbUrl,
+        {
+          id: 'esri',
+          attribution: mbAttr,
+          maxNativeZoom: L.Browser.retina ? 17 : 16,
+          maxZoom: L.Browser.retina ? 17 : 16,
+          detectRetina: true,
+        }
+      ).addTo(this.map);
+
+      var CartoDB_PositronOnlyLabels = L.tileLayer(
+        'https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png',
+        {
+          attribution:
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+          subdomains: 'abcd',
+          //maxNativeZoom: 16,
+          maxZoom: 16,
+          opacity: 0.6,
+          detectRetina: false,
+        }
+      ).addTo(this.map);
+    } else {
+      L.tileLayer.provider(this.options.basemap, this.options.basemapOptions).addTo(this.map);
+    }
+
+
 
     if (this.options.cluster) {
-      this.clusterGroup = L.markerClusterGroup({showCoverageOnHover: false});
+      this.clusterGroup = L.markerClusterGroup({ showCoverageOnHover: false });
       this.map.addLayer(this.clusterGroup);
     }
 
@@ -109,7 +141,7 @@ function OmekaMapBrowse(mapDivId, center, options) {
 
 OmekaMapBrowse.prototype = {
 
-  afterLoadItems: function() {
+  afterLoadItems: function () {
     if (this.options.fitMarkers) {
       this.fitMarkers();
     }
@@ -129,14 +161,14 @@ OmekaMapBrowse.prototype = {
 
   /* Need to parse KML manually b/c Google Maps API cannot access the KML
        behind the admin interface */
-  loadKmlIntoMap: function(kmlUrl, params) {
+  loadKmlIntoMap: function (kmlUrl, params) {
     var that = this;
     jQuery.ajax({
       type: 'GET',
       dataType: 'xml',
       url: kmlUrl,
       data: params,
-      success: function(data) {
+      success: function (data) {
         var xml = jQuery(data);
 
         /* KML can be parsed as:
@@ -154,7 +186,7 @@ OmekaMapBrowse.prototype = {
           that.browseBalloon = that.getBalloonStyling(xml);
 
           // Build the markers from the placemarks
-          jQuery.each(placeMarks, function(index, placeMark) {
+          jQuery.each(placeMarks, function (index, placeMark) {
             placeMark = jQuery(placeMark);
             that.buildMarkerFromPlacemark(placeMark);
           });
@@ -169,13 +201,13 @@ OmekaMapBrowse.prototype = {
     });
   },
 
-  getBalloonStyling: function(xml) {
+  getBalloonStyling: function (xml) {
     return xml.find('BalloonStyle text').text();
   },
 
   // Build a marker given the KML XML Placemark data
   // I wish we could use the KML file directly, but it's behind the admin interface so no go
-  buildMarkerFromPlacemark: function(placeMark) {
+  buildMarkerFromPlacemark: function (placeMark) {
     // Get the info for each location on the map
     var title = placeMark.find('name').text();
     var titleWithLink = placeMark.find('namewithlink').text();
@@ -199,13 +231,13 @@ OmekaMapBrowse.prototype = {
     }, balloon);
   },
 
-  buildListLinks: function(container) {
+  buildListLinks: function (container) {
     var that = this;
     var list = jQuery('<ul class="nav align-items-center flex-md-column d-md-block" role="tablist"></ul>');
     list.appendTo(container);
 
     // Loop through all the markers
-    jQuery.each(this.markers, function(index, marker) {
+    jQuery.each(this.markers, function (index, marker) {
       var listElement = jQuery('<li class="nav-item p-md-0 mb-md-3"></li>');
 
       // Make an <a> tag, give it a class for styling
@@ -220,13 +252,13 @@ OmekaMapBrowse.prototype = {
       link.html(image.removeClass('card-img').addClass('img-fluid'));
 
       // Clicking the link should take us to the map
-      link.bind('click', {}, function(event) {
+      link.bind('click', {}, function (event) {
         if (that.clusterGroup) {
-          that.clusterGroup.zoomToShowLayer(marker, function() {
+          that.clusterGroup.zoomToShowLayer(marker, function () {
             marker.fire('click');
           });
         } else {
-          that.map.once('moveend', function() {
+          that.map.once('moveend', function () {
             marker.fire('click');
           });
           that.map.flyTo(marker.getLatLng());
@@ -254,7 +286,7 @@ function OmekaMapForm(mapDivId, center, options) {
   this.formDiv = jQuery('#' + this.options.form.id);
 
   // Make the map clickable to add a location point.
-  this.map.on('click', function(event) {
+  this.map.on('click', function (event) {
     // If we are clicking a new spot on the map
     var marker = that.setMarker(event.latlng.wrap());
     if (marker) {
@@ -263,7 +295,7 @@ function OmekaMapForm(mapDivId, center, options) {
   });
 
   // Make the map update on zoom changes.
-  this.map.on('zoomend', function() {
+  this.map.on('zoomend', function () {
     that.updateZoomForm();
   });
 
@@ -277,7 +309,7 @@ function OmekaMapForm(mapDivId, center, options) {
 
 OmekaMapForm.prototype = {
   /* Set the marker to the point. */
-  setMarker: function(point) {
+  setMarker: function (point) {
     var that = this;
 
     if (this.options.confirmLocationChange && this.markers.length > 0 && !confirm('Are you sure you want to change the location of the item?')) {
@@ -294,7 +326,7 @@ OmekaMapForm.prototype = {
     this.map.panTo(point);
 
     //  Make the marker clear the form if clicked.
-    marker.on('click', function(event) {
+    marker.on('click', function (event) {
       if (!that.options.confirmLocationChange || confirm('Are you sure you want to remove the location of the item?')) {
         that.clearForm();
       }
@@ -305,7 +337,7 @@ OmekaMapForm.prototype = {
   },
 
   /* Update the latitude, longitude, and zoom of the form. */
-  updateForm: function(point) {
+  updateForm: function (point) {
     var latElement = document.getElementsByName('geolocation[latitude]')[0];
     var lngElement = document.getElementsByName('geolocation[longitude]')[0];
     var zoomElement = document.getElementsByName('geolocation[zoom_level]')[0];
@@ -323,13 +355,13 @@ OmekaMapForm.prototype = {
   },
 
   /* Update the zoom input of the form to be the current zoom on the map. */
-  updateZoomForm: function() {
+  updateZoomForm: function () {
     var zoomElement = document.getElementsByName('geolocation[zoom_level]')[0];
     zoomElement.value = this.map.getZoom();
   },
 
   /* Clear the form of all markers. */
-  clearForm: function() {
+  clearForm: function () {
     // Remove the markers from the map
     for (var i = 0; i < this.markers.length; i++) {
       this.markers[i].remove();
@@ -343,7 +375,7 @@ OmekaMapForm.prototype = {
   },
 
   /* Resize the map and center it on the first marker. */
-  resize: function() {
+  resize: function () {
     this.map.invalidateSize();
   }
 };

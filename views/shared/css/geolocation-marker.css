@@ -72,6 +72,12 @@ p.geolocation_balloon_description {
 }
 
 /* public only */
+.map.browse #map-viewer .leaflet-tile-pane,
+.items.show .leaflet-tile-pane {
+  z-index: 1;
+  filter: grayscale(100%);
+}
+
 .map .custom-icon {
   border-radius: 50%;
   background-color: #f9683b;
