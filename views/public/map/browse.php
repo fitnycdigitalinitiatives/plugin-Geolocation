@@ -10,7 +10,7 @@ echo head(array('title' => $title, 'bodyclass' => 'map browse'));
     <div class="col-md-6">
       <h1 class="text-center mb-4"><?php echo $title; ?></h1>
           <p class="mb-4">
-            This map shows the location where each bannerstone on this website was found. Click on the markers below to bring up information on the bannerstone discovered at that location. Or, click on the thumbnails along the side panel to see the location for specific bannerstones.
+            In most cases the bannerstones on this website were found in the 19th century by local farmers or collectors who later sold them to museums. This map shows the location where each bannerstone was presumably found. Click on the markers below to bring up information on the bannerstone discovered at that location. Or, click on the thumbnails along the side panel to see the location for specific bannerstones.
           </p>
     </div>
   </div>
