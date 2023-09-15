@@ -54,5 +54,10 @@ function bannerstone_thumbnail_url($item, $index = 0)
                     }
                     return $url;
                 }
+		elseif (($s3_path = metadata($item, array('Item Type Metadata', 's3_path'), array('index' => $index)))) {
+    			$path_parts = pathinfo($s3_path);
+    			$url = str_replace("/objects", "/thumbnails", $path_parts['dirname']) . '/' . substr($path_parts['filename'], 0, 36) . '.jpg';
+    			return $url;
+  		}
             }
  ?>
