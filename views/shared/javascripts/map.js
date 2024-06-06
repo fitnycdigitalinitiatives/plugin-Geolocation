@@ -73,7 +73,9 @@ OmekaMap.prototype = {
       return;
     }
 
-    this.map = L.map(this.mapDivId).setView([
+    this.map = L.map(this.mapDivId, {
+      scrollWheelZoom: false
+    }).setView([
       this.center.latitude, this.center.longitude
     ], this.center.zoomLevel);
     this.markerBounds = L.latLngBounds();
