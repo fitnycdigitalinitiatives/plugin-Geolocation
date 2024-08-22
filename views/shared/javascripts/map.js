@@ -115,7 +115,7 @@ OmekaMap.prototype = {
 
 
     if (this.options.cluster) {
-      this.clusterGroup = L.markerClusterGroup({ showCoverageOnHover: false });
+      this.clusterGroup = L.markerClusterGroup({ showCoverageOnHover: false, maxClusterRadius: 1 });
       this.map.addLayer(this.clusterGroup);
     }
 
@@ -240,35 +240,37 @@ OmekaMapBrowse.prototype = {
 
     // Loop through all the markers
     jQuery.each(this.markers, function (index, marker) {
-      var listElement = jQuery('<li class="nav-item p-md-0 mb-md-3"></li>');
+      if (jQuery(marker._popup._content).find('img').length > 0) {
+        var listElement = jQuery('<li class="nav-item p-md-0 mb-md-3"></li>');
 
-      // Make an <a> tag, give it a class for styling
-      var link = jQuery('<a></a>');
-      link.addClass('item-link');
+        // Make an <a> tag, give it a class for styling
+        var link = jQuery('<a></a>');
+        link.addClass('item-link');
 
-      // Links open up the markers on the map, clicking them doesn't actually go anywhere
-      link.attr('href', 'javascript:void(0);');
+        // Links open up the markers on the map, clicking them doesn't actually go anywhere
+        link.attr('href', 'javascript:void(0);');
 
-      // Each <li> starts with the title of the item
-      var image = jQuery(marker._popup._content).find('img');
-      link.html(image.removeClass('card-img').addClass('img-fluid'));
+        // Each <li> starts with the title of the item
+        var image = jQuery(marker._popup._content).find('img');
+        link.html(image.removeClass('card-img').addClass('img-fluid'));
 
-      // Clicking the link should take us to the map
-      link.bind('click', {}, function (event) {
-        if (that.clusterGroup) {
-          that.clusterGroup.zoomToShowLayer(marker, function () {
-            marker.fire('click');
-          });
-        } else {
-          that.map.once('moveend', function () {
-            marker.fire('click');
-          });
-          that.map.flyTo(marker.getLatLng());
-        }
-      });
+        // Clicking the link should take us to the map
+        link.bind('click', {}, function (event) {
+          if (that.clusterGroup) {
+            that.clusterGroup.zoomToShowLayer(marker, function () {
+              marker.fire('click');
+            });
+          } else {
+            that.map.once('moveend', function () {
+              marker.fire('click');
+            });
+            that.map.flyTo(marker.getLatLng());
+          }
+        });
 
-      link.appendTo(listElement);
-      listElement.appendTo(list);
+        link.appendTo(listElement);
+        listElement.appendTo(list);
+      }
     });
   }
 };

@@ -84,6 +84,14 @@ p.geolocation_balloon_description {
   border: 2px solid rgb(255 255 255 / 50%);
 }
 
+.map .marker-cluster-small {
+  background-color: rgb(255 255 255 / 50%);
+}
+
+.map .marker-cluster-small div {
+  background-color: rgba(249, 104, 59, 0.6);
+}
+
 .map.browse .leaflet-popup-content-wrapper {
   border-radius: 0;
 }
@@ -104,6 +112,10 @@ img.leaflet-marker-shadow {
   padding: 0 !important;
   border: 0 !important;
   background-color: transparent !important;
+}
+
+.geolocation_balloon_thumbnail:empty {
+  display: none;
 }
 
 @media (min-width:768px) {

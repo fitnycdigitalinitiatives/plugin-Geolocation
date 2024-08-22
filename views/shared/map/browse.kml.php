@@ -21,6 +21,20 @@
         $location = $locations[$item->id];
         $image = '<img class="card-img" src="' . bannerstone_thumbnail_url($item, 1) . '" alt="Bannerstone ' . metadata($item, array('Dublin Core', 'Title')) . '">';
         ?>
+        <?php if (strtolower(metadata('item', ['Item Type Metadata', 'NAGPRA'])) == "true"): ?>
+        <Placemark>
+            <name><?php echo xml_escape(metadata('item', 'display_title', array('no_escape' => true))); ?></name>
+            <namewithlink><?php echo xml_escape(link_to_item(metadata('item', array('Dublin Core', 'Title')), array('class' => 'view-item text-dark'))); ?></namewithlink>
+            <Snippet maxLines="2">Bannerstone Temporarily Removed Pending Tribal Perspectives</Snippet>
+            <collection><?php echo xml_escape(metadata('item', 'Collection Name')); ?></collection>
+            <Point>
+                <coordinates><?php echo $location['longitude']; ?>,<?php echo $location['latitude']; ?></coordinates>
+            </Point>
+            <?php if ($location['address']): ?>
+            <address><?php echo xml_escape($location['address']); ?></address>
+            <?php endif; ?>
+        </Placemark>
+        <?php else: ?>
         <Placemark>
             <name><?php echo xml_escape(metadata('item', 'display_title', array('no_escape' => true))); ?></name>
             <namewithlink><?php echo xml_escape(link_to_item(metadata('item', array('Dublin Core', 'Title')), array('class' => 'view-item text-dark'))); ?></namewithlink>
@@ -36,6 +50,7 @@
             <address><?php echo xml_escape($location['address']); ?></address>
             <?php endif; ?>
         </Placemark>
+        <?php endif; ?>
         <?php endforeach; ?>
     </Document>
 </kml>
