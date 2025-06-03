@@ -57,22 +57,11 @@
 
 <?php
 function bannerstone_thumbnail_url($item, $index = 0)
-            {
-                if (($fitdil_data_json = metadata($item, array('Item Type Metadata', 'fitdil_data'), array('index' => $index))) && ($github_collection = metadata($item, array('Item Type Metadata', 'github_collection')))) {
-                    $fitdil_data = json_decode(html_entity_decode($fitdil_data_json), true);
-                    $record_name = $fitdil_data["record-name"];
-                    // Fix for weirdness where iiif images for this American Museum of Natural History collection added suffix of -1
-                    if ((metadata($item, 'Collection Name')) == 'American Museum of Natural History') {
-                        $url = 'https://fit-bannerstones.github.io/' . $github_collection . '/images/' . $record_name . '-1/full/250,/0/default.jpg';
-                    } else {
-                        $url = 'https://fit-bannerstones.github.io/' . $github_collection . '/images/' . $record_name . '/full/250,/0/default.jpg';
-                    }
-                    return $url;
-                }
-		elseif (($s3_path = metadata($item, array('Item Type Metadata', 's3_path'), array('index' => $index)))) {
-    			$path_parts = pathinfo($s3_path);
-    			$url = str_replace("/objects", "/thumbnails", $path_parts['dirname']) . '/' . substr($path_parts['filename'], 0, 36) . '.jpg';
-    			return $url;
-  		}
-            }
+{
+    if (($s3_path = metadata($item, array('Item Type Metadata', 's3_path'), array('index' => $index)))) {
+        $path_parts = pathinfo($s3_path);
+        $url = str_replace("/objects", "/thumbnails", $path_parts['dirname']) . '/' . substr($path_parts['filename'], 0, 36) . '.jpg';
+        return $url;
+    }
+}
  ?>
